@@ -1,0 +1,13 @@
+# Core
+pandas==2.2.2
+openpyxl==3.1.2
+streamlit==1.35.0
+
+# LLM + Agent Frameworks
+openai==1.24.0
+langchain==0.1.19
+langgraph==0.0.36
+
+# Utils
+tqdm==4.66.2
+python-dotenv==1.0.1

@@ -1,0 +1,9 @@
+LoanNumber,BorrowerName,RequestedAmount,ApprovedAmount,EMIAmount,InterestRate
+2001,Daniel Harris,500000,450000,25000,8.5
+2002,Alice Black,350000,380000,,9.0
+2003,Bob Blue,450000,420000,-15000,7.8
+2004,Chris Brown,700000,700000,30000,8.0
+2005,Patricia White,400000,450000,,7.5
+2006,Samuel Green,,350000,20000,8.2
+2007,Lisa Brown,400000,410000,22000,7.5
+2008,George White,600000,650000,32000,8.5

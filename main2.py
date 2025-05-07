@@ -31,19 +31,35 @@ if uploaded_files:
         st.write(f"Loaded file: {file_name}")
         
     try:
-        # Process lineage on the uploaded files for lineage agent
-        merged_df = get_changes(csv_paths)  # This merges the CSV files for lineage agent
+        # Process lineage or data quality on the uploaded files
+        merged_df = get_changes(csv_paths)
         st.success("CSV files uploaded and lineage processed.")
-
-        # Clean up column names (strip any leading or trailing spaces)
-        merged_df.columns = merged_df.columns.str.strip()
-
-        # Print column names for debugging
-        st.write(f"Columns in merged DataFrame: {merged_df.columns}")
 
         # Ensure 'LoanNumber' is displayed as a string without commas
         merged_df['LoanNumber'] = merged_df['LoanNumber'].astype(str)
 
+        # User input for loan number(s)
+        loan_numbers_input = st.text_input("Enter one or more Loan Numbers (comma-separated):")
+        if loan_numbers_input:
+            loan_numbers = [ln.strip() for ln in loan_numbers_input.split(",")]
+            filtered_df = merged_df[merged_df["LoanNumber"].isin(loan_numbers)]
+            if not filtered_df.empty:
+                st.subheader("Lineage Mapping for Selected Loan Numbers")
+
+                # Display Lineage Summary in Markdown
+                lineage_comments = filtered_df["LineageSummary"].tolist()
+                for comment in lineage_comments:
+                    st.markdown(f"**Lineage for Loan {filtered_df['LoanNumber'].iloc[lineage_comments.index(comment)]}:**")
+                    st.markdown(f"- {comment}")
+
+            else:
+                st.warning("No matching Loan Numbers found.")
+
+        # Lineage Summary Button
+        if st.button("Generate LLM Summary for Lineage"):
+            lineage_summary = summarize_lineage_with_llm(filtered_df['LineageSummary'].tolist())
+            st.markdown("### 🧠 Lineage Summary via LLM")
+            st.markdown(f"**Summary:** {lineage_summary}")
         # Check if the 'RequestedAmount_x' or 'RequestedAmount_y' exists
         # and use the one that is correct for your use case
         if 'RequestedAmount_x' in merged_df.columns:

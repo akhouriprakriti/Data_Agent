@@ -5,7 +5,8 @@ import openai
 
 def run_dq_checks(merged_df):
     """
-    Runs dynamic data quality checks across multiple columns and files and returns a cleaned version and a report.
+    Runs data quality checks and basic fixes on the merged dataset.
+    Returns a cleaned version and a human-readable report.
     """
     dq_issues = []
     cleaned_df = merged_df.copy()
@@ -13,24 +14,24 @@ def run_dq_checks(merged_df):
     for index, row in cleaned_df.iterrows():
         issues = []
 
-        # Check for nulls in key fields (dynamic)
-        required_fields = ["LoanNumber", "RequestedAmount", "ApprovedAmount", "DisbursedAmount", "EMIAmount"]
-        for field in required_fields:
+        # Check for nulls in key fields
+        for field in ["LoanNumber", "RequestedAmount", "ApprovedAmount", "DisbursedAmount", "EMIAmount"]:
             if pd.isna(row[field]):
                 issues.append(f"Missing value in {field}")
 
-        # Logical checks: Dynamic checks for approved/disbursed amounts
-        if 'ApprovedAmount' in row and 'RequestedAmount' in row and row['ApprovedAmount'] > row['RequestedAmount']:
+        # Logical check: ApprovedAmount should not exceed RequestedAmount
+        if row['ApprovedAmount'] > row['RequestedAmount']:
             issues.append("Approved amount > requested amount")
 
-        if 'DisbursedAmount' in row and 'ApprovedAmount' in row and row['DisbursedAmount'] > row['ApprovedAmount']:
+        # Logical check: DisbursedAmount should not exceed ApprovedAmount
+        if row['DisbursedAmount'] > row['ApprovedAmount']:
             issues.append("Disbursed amount > approved amount")
 
-        # EMI sanity check (dynamic column handling)
-        if 'EMIAmount' in row and row['EMIAmount'] <= 0:
+        # EMI sanity check
+        if row['EMIAmount'] <= 0:
             issues.append("Invalid EMI amount")
 
-        # Apply basic fix: fill missing EMI with calculated approximation (dynamic)
+        # Apply basic fix: fill missing EMI with calculated approximation
         if pd.isna(row['EMIAmount']) and not pd.isna(row['ApprovedAmount']) and not pd.isna(row['InterestRate']):
             approx_emi = round(row['ApprovedAmount'] * (row['InterestRate'] / 100) / 12, 2)
             cleaned_df.at[index, 'EMIAmount'] = approx_emi

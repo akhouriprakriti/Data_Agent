@@ -28,7 +28,7 @@ if uploaded_files:
         file_name = uploaded_file.name
         file_df = pd.read_csv(uploaded_file)
         csv_paths[file_name] = file_df
-        st.write(f"Loaded file: {file_name}")
+        
         
     try:
         # Process lineage or data quality on the uploaded files
@@ -37,7 +37,7 @@ if uploaded_files:
 
         # Ensure 'LoanNumber' is displayed as a string without commas
         merged_df['LoanNumber'] = merged_df['LoanNumber'].astype(str)
-
+        st.subheader("💸 Loan Data Lineage Mapper")
         # User input for loan number(s)
         loan_numbers_input = st.text_input("Enter one or more Loan Numbers (comma-separated):")
         if loan_numbers_input:
@@ -56,9 +56,9 @@ if uploaded_files:
                 st.warning("No matching Loan Numbers found.")
 
         # Lineage Summary Button
-        if st.button("Generate LLM Summary for Lineage"):
+        if st.button("Generate Summary for Lineage"):
             lineage_summary = summarize_lineage_with_llm(filtered_df['LineageSummary'].tolist())
-            st.markdown("### 🧠 Lineage Summary via LLM")
+            st.markdown("### 🧠 Lineage Summary ")
             st.markdown(f"**Summary:** {lineage_summary}")
         # Check if the 'RequestedAmount_x' or 'RequestedAmount_y' exists
         # and use the one that is correct for your use case
@@ -70,7 +70,7 @@ if uploaded_files:
             st.error("'RequestedAmount' column is missing in the uploaded data.")
         
         # Data Quality Checks
-        st.subheader("Run Data Quality Checks")
+        st.subheader("🔧 Data Quality Analyzer")
         # Pass the merged DataFrame (not csv_paths) to the data quality agent
         cleaned_df, dq_report = run_dq_checks(merged_df)  # Corrected this part
 
@@ -81,9 +81,9 @@ if uploaded_files:
             st.warning("'LoanNumber' column is missing from the processed data.")
 
         # Generate LLM Summary for Data Quality Issues
-        if st.button("Generate LLM Summary for DQ Issues"):
+        if st.button("Generate Summary for DQ Issues"):
             dq_summary = summarize_dq_with_llm(dq_report)
-            st.markdown("### 🩺 Data Quality Summary via LLM")
+            st.markdown("### 🩺 Data Quality Summary ")
             st.markdown(f"**Summary:** {dq_summary}")
 
     except Exception as ex:

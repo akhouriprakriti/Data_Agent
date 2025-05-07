@@ -46,6 +46,7 @@ def get_changes(csv_paths):
         comments.append(comment)
 
     merged_df['LineageSummary'] = comments
+    print(merged_df.head())  # Debugging line to check the merged DataFrame
     return merged_df
 
 
